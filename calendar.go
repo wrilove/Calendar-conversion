@@ -36,19 +36,6 @@ func FindYear(birthday string) []int {
 	}
 	return res
 }
-func FindYearByLunar(birthday string) []int {
-	var res []int
-	solar := BirthdayToSolarTime(birthday)
-	lunar := BirthdayToLunarTime(birthday)
-	for i := startYear; i <= endYear; i++ {
-		constructedSolar := time.Date(i, solar.Month(), solar.Day(), 0, 0, 0, 0, time.Local)
-		constructedLunar := SolarTimeToLunarTime(constructedSolar)
-		if constructedLunar.Month() == lunar.Month() && constructedLunar.Day() == lunar.Day() {
-			res = append(res, i)
-		}
-	}
-	return res
-}
 
 // SolarToLunar
 // time.Time to time.Time
