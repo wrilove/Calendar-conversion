@@ -37,9 +37,49 @@ func FindYear(birthday string) []int {
 	return res
 }
 
-// SolarToLunar
-// time.Time to time.Time
-// SolarDate to LunarDate
+func BirthdayToSolarTime(birthday string) time.Time {
+	parsed, err := time.Parse("2006-01-02", birthday)
+	if err != nil {
+		fmt.Println("日期解析错误:", err)
+		return time.Time{}
+	}
+	return parsed
+}
+
+func BirthdayToLunarTime(birthday string) time.Time {
+	parsed, err := time.Parse("2006-01-02", birthday)
+	if err != nil {
+		fmt.Println("日期解析错误:", err)
+		return time.Time{}
+	}
+	return SolarTimeToLunarTime(parsed)
+}
+func SolarDateToLunarDate(solarDate string) string {
+	parsed, err := time.Parse("2006-01-02", solarDate)
+	if err != nil {
+		fmt.Println("日期解析错误:", err)
+		return ""
+	}
+	res := SolarTimeToLunarTime(parsed)
+	return res.Format("2006-01-02")
+}
+func LunarDateToSolarDate(lunarDate string) string {
+	parsed, err := time.Parse("2006-01-02", lunarDate)
+	if err != nil {
+		fmt.Println("日期解析错误:", err)
+		return ""
+	}
+	res := LunarTimeToSolarTime(parsed)
+	return res.Format("2006-01-02")
+}
+
+func LunarTimeToSolarTime(lunarTime time.Time) time.Time {
+	lunar := LunarTimeToLunar(lunarTime)
+	solar := LunarToSolar(*lunar)
+	solarTime := SolarToTime(solar)
+	return solarTime
+}
+
 func SolarTimeToLunarTime(solar time.Time) time.Time {
 	lunar := SolarToLunar(Solar{
 		SolarDay:   solar.Day(),
@@ -50,40 +90,28 @@ func SolarTimeToLunarTime(solar time.Time) time.Time {
 	return lunarTime
 }
 
-// 对用户输入的生日格式化为阳历的time.Time
-func BirthdayToSolarTime(birthday string) time.Time {
-	parsed, err := time.Parse("2006-01-02", birthday)
-	if err != nil {
-		fmt.Println("日期解析错误:", err)
-		return time.Time{}
-	}
-	return parsed
-}
-
-// 对用户输入的生日格式化为阴历的time.Time
-func BirthdayToLunarTime(birthday string) time.Time {
-	parsed, err := time.Parse("2006-01-02", birthday)
-	if err != nil {
-		fmt.Println("日期解析错误:", err)
-		return time.Time{}
-	}
-	return SolarTimeToLunarTime(parsed)
-}
-
-func BirthdayToSolar(birthday time.Time) *Solar {
+func SolarTimeToSolar(date time.Time) *Solar {
 	return &Solar{
-		SolarDay:   birthday.Day(),
-		SolarMonth: int(birthday.Month()),
-		SolarYear:  birthday.Year(),
+		SolarDay:   date.Day(),
+		SolarMonth: int(date.Month()),
+		SolarYear:  date.Year(),
 	}
 }
-func BirthdayToLunar(birthday time.Time) *Lunar {
+func LunarTimeToLunar(date time.Time) *Lunar {
 	lunar := SolarToLunar(Solar{
-		birthday.Day(),
-		int(birthday.Month()),
-		birthday.Year(),
+		date.Day(),
+		int(date.Month()),
+		date.Year(),
 	})
 	return lunar
+}
+func SolarToTime(solar *Solar) time.Time {
+	solarTime := time.Date(solar.SolarYear, time.Month(solar.SolarMonth), solar.SolarDay, 0, 0, 0, 0, time.Local)
+	return solarTime
+}
+func LunarToTime(lunar *Lunar) time.Time {
+	lunarTime := time.Date(lunar.LunarYear, time.Month(lunar.LunarMonth), lunar.LunarDay, 0, 0, 0, 0, time.Local)
+	return lunarTime
 }
 
 /**
